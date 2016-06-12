@@ -53,7 +53,35 @@ public class TestAssignment {
    * @return Iterator with all elements and ascending sorting retained
    */
   public static Iterator<BigInteger> mergeIterators(List<Iterator<BigInteger>> iterators) {
-    throw new java.lang.UnsupportedOperationException("please implement this method");
+    Iterator<BigInteger> result = new Iterator<BigInteger>() {
+      final private List<Iterator<BigInteger>> list = new ArrayList<>(iterators);
+      final private Map<Integer, BigInteger> values = IntStream.range(0, iterators.size())
+              .boxed()
+              .filter(i -> iterators.get(i).hasNext())
+              .collect(Collectors.toMap(i -> i, i -> iterators.get(i).next()));
+
+      @Override
+      public boolean hasNext() {
+        return !values.isEmpty();
+      }
+
+      @Override
+      public BigInteger next() {
+        final Optional<Map.Entry<Integer, BigInteger>> opt = values.entrySet().stream().sorted(Map.Entry.comparingByValue(BigInteger::compareTo)).findFirst();
+        if (!opt.isPresent()) {
+          throw new RuntimeException("Smth wrong; stream doesn't work"); // just to be sure
+        }
+        Map.Entry<Integer, BigInteger> entry = opt.get();
+        BigInteger result = entry.getValue();
+        if (list.get(entry.getKey()).hasNext()) {
+          values.put(entry.getKey(), list.get(entry.getKey()).next());
+        } else {
+          values.remove(entry.getKey());
+        }
+        return result;
+      }
+    };
+    return result;
   }
 
   /**

@@ -6,7 +6,9 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Future;
 
@@ -85,7 +87,28 @@ public class TestAssignmentTest {
 
     @Test
     public void testMergeIterators() throws Exception {
+        List<Iterator<BigInteger>> iterators = new ArrayList<>();
+        iterators.add(sampleAfter(iteratorFromOne(), 2, 4)); // {3, 4, 5, 6, 7}
+        iterators.add(sampleAfter(iteratorFromOne(), 1, 3)); // {2, 3, 4, 5}
+        iterators.add(sampleAfter(iteratorFromOne(), 5, 4)); // {6, 7, 8, 9, 10}
 
+        List<Iterator<BigInteger>> copyIterators = new ArrayList<>();
+        copyIterators.add(sampleAfter(iteratorFromOne(), 2, 4));
+        copyIterators.add(sampleAfter(iteratorFromOne(), 1, 3));
+        copyIterators.add(sampleAfter(iteratorFromOne(), 5, 4));
+
+        // to avoid possibly changing of sampleAfter method
+        List<BigInteger> expectedList = new ArrayList<>();
+        copyIterators.stream().forEach(i -> {
+            while (i.hasNext()) expectedList.add(i.next());
+        });
+        expectedList.sort(BigInteger::compareTo);
+
+        Iterator<BigInteger> result = mergeIterators(iterators);
+        List<BigInteger> resultList = new ArrayList<>();
+        while (result.hasNext()) resultList.add(result.next());
+
+        assertEquals(expectedList, resultList);
     }
 
     @Test
