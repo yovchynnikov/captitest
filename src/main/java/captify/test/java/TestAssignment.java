@@ -25,7 +25,7 @@ public class TestAssignment {
    * @return sampleAfter(iteratorFromOne, 1, 2) should be same as to Seq[BigInt](2,3,4).toIterator
    */
   public static Iterator<BigInteger> sampleAfter(Iterator<BigInteger> iterator, int after, int sampleSize) {
-    throw new java.lang.UnsupportedOperationException("please implement this method");
+    return Stream.generate(iterator::next).skip(after).limit(sampleSize + 1).iterator();
   }
 
   /**
@@ -39,7 +39,7 @@ public class TestAssignment {
    * @return value at given position
    */
   public static BigInteger valueAt(Iterator<BigInteger> iterator, int position) {
-    throw new java.lang.UnsupportedOperationException("please implement this method");
+    return Stream.generate(iterator::next).skip(position).limit(1).findFirst().get();
   }
 
   /**
