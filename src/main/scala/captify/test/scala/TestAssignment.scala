@@ -19,7 +19,7 @@ object TestAssignment {
    * @param sampleSize quantity of elements returned
    * @return sampleAfter(iteratorFromOne, 1, 2) should be same as to Seq[BigInt](2,3,4).toIterator 
    */
-  def sampleAfter(iterator: Iterator[BigInt], after: Int, sampleSize: Int): Iterator[BigInt] = ???
+  def sampleAfter(iterator: Iterator[BigInt], after: Int, sampleSize: Int): Iterator[BigInt] = iterator.slice(after, after + sampleSize + 1)
 
   /**
    * Get value by index from given iterator.
@@ -31,7 +31,7 @@ object TestAssignment {
    * @param position zero-based
    * @return value at given position
    */
-  def valueAt(iterator: Iterator[BigInt], position: Int): BigInt = ???
+  def valueAt(iterator: Iterator[BigInt], position: Int): BigInt = iterator.drop(position).next()
 
   /**
    * Produce an iterator which generates values from given subset of input iterators.
