@@ -2,12 +2,9 @@ package captify.test.java;
 
 import java.math.BigInteger;
 import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.Future;
+import java.util.concurrent.*;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static captify.test.java.SparseIterators.*;
@@ -39,6 +36,7 @@ public class TestAssignment {
    * @return value at given position
    */
   public static BigInteger valueAt(Iterator<BigInteger> iterator, int position) {
+    // it should be done smth with isPresent() to check findFirst
     return Stream.generate(iterator::next).skip(position).limit(1).findFirst().get();
   }
 
@@ -92,7 +90,21 @@ public class TestAssignment {
    * @return Map from Sparsity to Future[Approximation]
    */
   public static Map<Integer, Future<Double>> approximatesFor(int sparsityMin, int sparsityMax, int extent) {
-    throw new java.lang.UnsupportedOperationException("please implement this method");
+    ExecutorService executorService = Executors.newCachedThreadPool();
+    Map<Integer, Future<Double>> result = IntStream.range(sparsityMin, sparsityMax + 1)
+            .boxed()
+            .collect(Collectors.toMap(key -> key, value -> executorService.submit(() -> approximateSparsity(value, extent)),
+                    (key, value) -> {
+                      throw new IllegalStateException();
+                    },
+                    LinkedHashMap::new));
+    executorService.shutdown();
+    try {
+      while (!executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS)) ;
+    } catch (InterruptedException e) {
+      throw new RuntimeException(e); // wrapping to runtime exception instead of adding checked to method signature or silence it
+    }
+    return result;
   }
 
 }
