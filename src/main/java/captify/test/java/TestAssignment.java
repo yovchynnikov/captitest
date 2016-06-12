@@ -72,7 +72,7 @@ public class TestAssignment {
           throw new RuntimeException("Smth wrong; stream doesn't work"); // just to be sure
         }
         Map.Entry<Integer, BigInteger> entry = opt.get();
-        BigInteger result = entry.getValue();
+        final BigInteger result = entry.getValue();
         if (list.get(entry.getKey()).hasNext()) {
           values.put(entry.getKey(), list.get(entry.getKey()).next());
         } else {
@@ -118,7 +118,7 @@ public class TestAssignment {
    * @return Map from Sparsity to Future[Approximation]
    */
   public static Map<Integer, Future<Double>> approximatesFor(int sparsityMin, int sparsityMax, int extent) {
-    ExecutorService executorService = Executors.newCachedThreadPool();
+    ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     Map<Integer, Future<Double>> result = IntStream.range(sparsityMin, sparsityMax + 1)
             .boxed()
             .collect(Collectors.toMap(key -> key, value -> executorService.submit(() -> approximateSparsity(value, extent)),
